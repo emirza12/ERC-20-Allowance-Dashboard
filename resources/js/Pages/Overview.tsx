@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Head, router, usePage } from '@inertiajs/react';
+import { useState } from 'react';
+import { Head, router } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
 import AllowancesList from '@/Components/AllowancesList';
 import Modal from '@/Components/Modal';
@@ -14,32 +14,12 @@ interface Allowance {
 
 interface Props {
     allowances: Allowance[];
-    showEditModal?: boolean;
-    existingAllowance?: Allowance;
-    warning?: string;
 }
 
-interface PageProps {
-    flash: {
-        showEditModal?: boolean;
-        existingAllowance?: Allowance;
-        warning?: string;
-        success?: string;
-    };
-}
-
-export default function Overview({ allowances, showEditModal: initialShowModal, existingAllowance: initialAllowance, warning }: Props) {
-    const [isLoading, setIsLoading] = useState(false);
-    const [showEditModal, setShowEditModal] = useState(!!initialShowModal);
-    const [editingAllowance, setEditingAllowance] = useState<Allowance | null>(initialAllowance || null);
+export default function Overview({ allowances }: Props) {
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editingAllowance, setEditingAllowance] = useState<Allowance | null>(null);
     const [newAmount, setNewAmount] = useState('');
-
-    useEffect(() => {
-        if (initialShowModal && initialAllowance) {
-            setEditingAllowance(initialAllowance);
-            setShowEditModal(true);
-        }
-    }, [initialShowModal, initialAllowance]);
 
     const handleEditSubmit = async () => {
         try {
@@ -53,31 +33,9 @@ export default function Overview({ allowances, showEditModal: initialShowModal, 
         }
     };
 
-    // Recharger les données périodiquement
-    useEffect(() => {
-        const interval = setInterval(() => {
-            router.get(route('overview'), {}, {
-                preserveScroll: true,
-                preserveState: true,
-                only: ['allowances']
-            });
-        }, 2000);
-
-        return () => clearInterval(interval);
-    }, []);
-
     return (
-        <MainLayout
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Overview</h2>}
-        >
+        <MainLayout>
             <Head title="Overview" />
-
-            {warning && (
-                <div className="mb-4 p-4 bg-yellow-100 text-yellow-700 rounded-lg">
-                    {warning}
-                </div>
-            )}
-
             <div className="py-12">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="mb-8">
@@ -89,7 +47,7 @@ export default function Overview({ allowances, showEditModal: initialShowModal, 
                         </p>
                     </div>
 
-                    <div className={`bg-white rounded-lg shadow-lg border border-black/10 ${isLoading ? 'opacity-50' : ''}`}>
+                    <div className="bg-white rounded-lg shadow-lg border border-black/10">
                         <AllowancesList initialAllowances={allowances} />
                     </div>
                 </div>
@@ -100,9 +58,6 @@ export default function Overview({ allowances, showEditModal: initialShowModal, 
                     <h3 className="text-lg font-medium text-gray-900 mb-4">
                         Modify Allowance Amount
                     </h3>
-                    <p className="text-sm text-gray-600 mb-4">
-                        This allowance already exists. Enter a new amount to modify it.
-                    </p>
                     <input
                         type="text"
                         value={newAmount}

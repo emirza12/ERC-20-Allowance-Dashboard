@@ -10,19 +10,9 @@ class AllowanceController extends Controller
 {
     public function index()
     {
-        try {
-            $allowances = Allowance::orderBy('created_at', 'desc')->get();
-            \Log::info('Fetched allowances:', ['count' => $allowances->count()]);
-            
-            return Inertia::render('Overview', [
-                'allowances' => $allowances
-            ]);
-        } catch (\Exception $e) {
-            \Log::error('Error fetching allowances:', ['error' => $e->getMessage()]);
-            return Inertia::render('Overview', [
-                'allowances' => []
-            ]);
-        }
+        return Inertia::render('Overview', [
+            'allowances' => Allowance::orderBy('created_at', 'desc')->get()
+        ]);
     }
 
     public function store(Request $request)
@@ -43,13 +33,12 @@ class AllowanceController extends Controller
 
             if ($existingAllowance) {
                 return redirect()->back()->withErrors([
-                    'error' => 'This allowance already exists. Please use a different combination of addresses.'
+                    'error' => 'This allowance already exists.'
                 ]);
             }
 
-            $allowance = Allowance::create($validated);
-            return redirect()->route('overview')->with('success', 'Allowance added successfully!');
-
+            Allowance::create($validated);
+            return redirect()->route('overview');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Failed to save allowance.']);
         }
@@ -57,12 +46,7 @@ class AllowanceController extends Controller
 
     public function update(Request $request, Allowance $allowance)
     {
-        $validated = $request->validate([
-            'allowance_amount' => 'required|string',
-        ]);
-
-        $allowance->update($validated);
-
+        $allowance->update($request->validate(['allowance_amount' => 'required|string']));
         return redirect()->route('allowances.index');
     }
 

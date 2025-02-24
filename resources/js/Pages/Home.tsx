@@ -8,66 +8,84 @@ export default function Home() {
             
             <div className="py-12">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                    {/* Header */}
+                    {/* En-tête */}
                     <div className="text-center mb-16">
-                        <h1 className="heading-xlarge mb-6 text-black">
-                            Allowance Dashboard
+                        <h1 className="text-4xl font-bold text-black mb-6">
+                            ERC-20 Allowance Dashboard
                         </h1>
-                        <p className="text-xl text-gray-600">
-                            Manage your ERC20 token approvals with ease
+                        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                            Manage your ERC-20 token allowances securely and efficiently on the Holesky network
                         </p>
                     </div>
 
                     <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                        {/* What is an allowance section */}
+                        {/* What is an allowance */}
                         <div className="bg-white rounded-lg shadow-lg p-8 border border-black/10">
                             <h2 className="text-2xl font-semibold text-black mb-4">
-                                What is an allowance?
+                                What is an Allowance?
                             </h2>
                             <p className="text-gray-600 mb-4">
-                                An allowance is a permission you grant to a smart contract 
-                                to spend your ERC20 tokens on your behalf. It's similar to 
-                                giving power of attorney to a decentralized application (dApp) 
-                                to use your tokens.
-                            </p>
-                            <p className="text-gray-600">
-                                This feature is essential for many DeFi applications, 
-                                but it's important to manage these permissions carefully 
-                                for the security of your assets.
+                                An allowance in ERC-20 tokens is a permission you grant to another address (like a smart contract) 
+                                to spend tokens on your behalf. This is essential for interacting with DeFi protocols and other 
+                                decentralized applications.
                             </p>
                         </div>
 
-                        {/* Features section */}
+                        {/* Key Features */}
                         <div className="bg-white rounded-lg shadow-lg p-8 border border-black/10">
                             <h2 className="text-2xl font-semibold text-black mb-4">
-                                Features
+                                Key Features
                             </h2>
                             <ul className="list-disc list-inside text-gray-600 space-y-2">
-                                <li>View all your allowances at a glance</li>
-                                <li>Easily modify approved amounts</li>
+                                <li>Track all your token allowances</li>
+                                <li>Manage permissions securely</li>
+                                <li>Update allowance amounts</li>
                                 <li>Revoke unused permissions</li>
-                                <li>Simple and intuitive interface</li>
+                                <li>Real-time blockchain updates</li>
                             </ul>
                         </div>
 
-                        {/* About section */}
+                        {/* Getting Started */}
                         <div className="bg-white rounded-lg shadow-lg p-8 border border-black/10">
+                            <h2 className="text-2xl font-semibold text-black mb-4">
+                                Getting Started
+                            </h2>
+                            <div className="text-gray-600 space-y-4">
+                                <p>
+                                    1. Connect your wallet using the button in the top right
+                                </p>
+                                <p>
+                                    2. Navigate to "Add" to create a new allowance
+                                </p>
+                                <p>
+                                    3. Use "Overview" to manage your existing allowances
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Technical Info & About */}
+                    <div className="mt-16">
+                        <div className="bg-white rounded-lg shadow-lg p-8 border border-black/10 lg:mx-auto max-w-5xl">
                             <h2 className="text-2xl font-semibold text-black mb-4">
                                 About the Project
                             </h2>
-                            <p className="text-gray-600 mb-4">
-                                This project was developed by Eva MIRZA as part of an 
-                                initiative to improve the security and management of 
-                                ERC20 allowances on the Ethereum blockchain.
+                            <p className="text-gray-600 mb-8">
+                                This project was developed by Eva MIRZA as part of the Junior Fullstack Case Study internship. 
+                                It demonstrates the implementation of a secure and user-friendly interface for managing ERC-20 
+                                token allowances on the Holesky network.
                             </p>
-                            <div className="flex items-center justify-center mt-6">
+                            <div className="flex justify-center">
                                 <img 
                                     src="/images/kiln-logo.png" 
                                     alt="Kiln Logo" 
-                                    className="h-12"
+                                    className="h-16"
                                 />
                             </div>
                         </div>
+                        <p className="text-sm text-gray-500 text-center mt-6">
+                            Running on Holesky Network • Built with Laravel, React, and TypeScript
+                        </p>
                     </div>
                 </div>
             </div>
