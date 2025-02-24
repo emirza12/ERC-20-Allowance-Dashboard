@@ -10,12 +10,19 @@ class AllowanceController extends Controller
 {
     public function index()
     {
-        // Récupérer les allowances triées par date de création
-        $allowances = Allowance::orderBy('created_at', 'desc')->get();
-        
-        return Inertia::render('Overview', [
-            'allowances' => $allowances
-        ]);
+        try {
+            $allowances = Allowance::orderBy('created_at', 'desc')->get();
+            \Log::info('Fetched allowances:', ['count' => $allowances->count()]);
+            
+            return Inertia::render('Overview', [
+                'allowances' => $allowances
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching allowances:', ['error' => $e->getMessage()]);
+            return Inertia::render('Overview', [
+                'allowances' => []
+            ]);
+        }
     }
 
     public function store(Request $request)
@@ -27,25 +34,26 @@ class AllowanceController extends Controller
             'owner_address' => 'required|string',
         ]);
 
-        $existingAllowance = Allowance::where([
-            'contract_address' => $validated['contract_address'],
-            'spender_address' => $validated['spender_address'],
-            'owner_address' => $validated['owner_address'],
-        ])->first();
+        try {
+            // Créer une nouvelle allowance sans vérifier l'existence
+            $allowance = Allowance::create($validated);
 
-        if ($existingAllowance) {
-            $existingAllowance->update([
-                'allowance_amount' => $validated['allowance_amount']
+            // Log pour le débogage
+            \Log::info('New allowance created:', $allowance->toArray());
+
+            return redirect()->route('overview')->with([
+                'message' => 'Allowance added successfully!',
+                'allowance' => $allowance
             ]);
-        } else {
-            Allowance::create($validated);
-        }
 
-        // Rediriger avec un rechargement forcé
-        return redirect()->route('overview')->with([
-            'message' => $existingAllowance ? 'Allowance updated successfully!' : 'Allowance added successfully!',
-            'forceReload' => true
-        ]);
+        } catch (\Exception $e) {
+            \Log::error('Error creating allowance:', [
+                'error' => $e->getMessage(),
+                'data' => $validated
+            ]);
+
+            return redirect()->back()->withErrors(['error' => 'Failed to save allowance.']);
+        }
     }
 
     public function update(Request $request, Allowance $allowance)

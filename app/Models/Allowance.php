@@ -12,4 +12,17 @@ class Allowance extends Model
         'spender_address',
         'allowance_amount'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::created(function ($allowance) {
+            \Log::info('New allowance created:', $allowance->toArray());
+        });
+        
+        static::updated(function ($allowance) {
+            \Log::info('Allowance updated:', $allowance->toArray());
+        });
+    }
 } 

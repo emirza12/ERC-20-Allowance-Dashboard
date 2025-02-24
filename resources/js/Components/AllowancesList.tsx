@@ -87,7 +87,7 @@ export default function AllowancesList({ initialAllowances }: Props) {
             });
 
             setEditingAllowance(null);
-            window.location.reload(); // Force le rechargement complet
+            router.reload();
         } catch (error) {
             console.error('Edit error:', error);
         } finally {
@@ -100,8 +100,7 @@ export default function AllowancesList({ initialAllowances }: Props) {
         try {
             await revoke(allowance.contract_address, allowance.spender_address);
             await router.delete(route('allowances.destroy', allowance.id));
-            
-            window.location.reload(); // Force le rechargement complet
+            router.reload();
         } catch (error) {
             console.error('Revoke error:', error);
         } finally {

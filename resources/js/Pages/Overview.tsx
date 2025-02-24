@@ -1,4 +1,5 @@
-import { Head } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
+import { Head, router } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
 import AllowancesList from '@/Components/AllowancesList';
 
@@ -15,6 +16,22 @@ interface Props {
 }
 
 export default function Overview({ allowances }: Props) {
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Recharger les données toutes les 2 secondes
+    useEffect(() => {
+        const interval = setInterval(async () => {
+            setIsLoading(true);
+            await router.reload();
+            setIsLoading(false);
+        }, 2000);
+
+        // Recharger immédiatement au montage
+        router.reload();
+
+        return () => clearInterval(interval);
+    }, []);
+
     return (
         <MainLayout
             header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Overview</h2>}
@@ -32,7 +49,7 @@ export default function Overview({ allowances }: Props) {
                         </p>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow-lg border border-black/10">
+                    <div className={`bg-white rounded-lg shadow-lg border border-black/10 ${isLoading ? 'opacity-50' : ''}`}>
                         <AllowancesList initialAllowances={allowances} />
                     </div>
                 </div>

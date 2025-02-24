@@ -3,12 +3,15 @@ import MainLayout from '@/Layouts/MainLayout';
 import { useState } from 'react';
 import { useERC20 } from '@/hooks/useERC20';
 import { router } from '@inertiajs/react';
+import { useAccount } from 'wagmi';
 
 export default function AddAllowance() {
+    const { address } = useAccount();
     const [formData, setFormData] = useState({
         contract_address: '',
         spender_address: '',
-        allowance_amount: ''
+        allowance_amount: '',
+        owner_address: address || ''
     });
     const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -25,10 +28,20 @@ export default function AddAllowance() {
                 formData.allowance_amount
             );
 
-            await router.post(route('allowances.store'), formData);
+            const dataToSend = {
+                ...formData,
+                owner_address: address
+            };
+
+            await router.post(route('allowances.store'), dataToSend);
             
-            // Force le rechargement de la page
-            window.location.href = route('overview');
+            // Redirection avec rechargement forcé
+            router.visit(route('overview'), {
+                method: 'get',
+                preserveState: false,
+                preserveScroll: false,
+                replace: true
+            });
 
         } catch (error) {
             console.error('Error:', error);
