@@ -35,23 +35,22 @@ class AllowanceController extends Controller
         ]);
 
         try {
-            // Créer une nouvelle allowance sans vérifier l'existence
+            $existingAllowance = Allowance::where([
+                'contract_address' => $validated['contract_address'],
+                'spender_address' => $validated['spender_address'],
+                'owner_address' => $validated['owner_address'],
+            ])->first();
+
+            if ($existingAllowance) {
+                return redirect()->back()->withErrors([
+                    'error' => 'This allowance already exists. Please use a different combination of addresses.'
+                ]);
+            }
+
             $allowance = Allowance::create($validated);
-
-            // Log pour le débogage
-            \Log::info('New allowance created:', $allowance->toArray());
-
-            return redirect()->route('overview')->with([
-                'message' => 'Allowance added successfully!',
-                'allowance' => $allowance
-            ]);
+            return redirect()->route('overview')->with('success', 'Allowance added successfully!');
 
         } catch (\Exception $e) {
-            \Log::error('Error creating allowance:', [
-                'error' => $e->getMessage(),
-                'data' => $validated
-            ]);
-
             return redirect()->back()->withErrors(['error' => 'Failed to save allowance.']);
         }
     }
