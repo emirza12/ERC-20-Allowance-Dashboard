@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --primary: #FF5500;
+    --black: #000000;
+    --white: #FFFFFF;
+    --gray-light: #F5F5F5;
+    --gray-medium: #E5E5E5;
+}
+
+/* Styles globaux */
+body {
+    background-color: var(--white);
+    color: var(--black);
+}
+
+/* Styles des boutons */
+.login-button {
+    border: 1px solid var(--primary);
+    background-color: var(--primary);
+    color: var(--white);
+    text-align: center;
+    border-radius: 999px;
+    padding: .75rem 1.25rem;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 146%;
+    transition: all .25s;
+}
+
+.login-button:hover {
+    background-color: var(--white);
+    color: var(--primary);
+}
+
+/* Style du tableau */
+.allowances-table {
+    background: var(--white);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.allowances-table th {
+    background-color: var(--gray-light);
+    color: var(--black);
+    font-weight: 500;
+}
+
+.allowances-table tr:hover {
+    background-color: var(--gray-light);
+}
+
+/* Style des titres */
+.heading-xlarge {
+    color: var(--black);
+    letter-spacing: -.18rem;
+    font-size: 4.5rem;
+    font-weight: 600;
+    line-height: 111.111%;
+}
+
+/* Style de la navigation */
+.nav-link {
+    color: var(--black);
+    transition: color .25s;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--primary);
+}
+
+/* Pour le bouton Disconnect */
+.login-button.inverted {
+    background-color: var(--primary);
+    color: var(--white);
+}
+
+.login-button.inverted:hover {
+    background-color: var(--white);
+    color: var(--primary);
+}
