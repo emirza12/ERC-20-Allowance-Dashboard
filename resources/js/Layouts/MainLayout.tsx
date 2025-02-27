@@ -1,7 +1,5 @@
 import { useState, PropsWithChildren } from 'react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
-import NavLink from '@/Components/NavLink';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link } from '@inertiajs/react';
 import WalletStatus from '@/Components/WalletStatus';
 
@@ -15,26 +13,20 @@ export default function MainLayout({ header, children }: PropsWithChildren<{ hea
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <nav className="bg-white shadow-md">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-20">
-                        {/* Logo et Navigation */}
-                        <div className="flex items-center">
+            <nav className="nav-container">
+                <div className="content-container">
+                    <div className="nav-content">
+                        <div className="nav-logo-section">
                             <Link href={route('home')} className="flex items-center">
                                 <ApplicationLogo className="w-32 h-32" />
                             </Link>
 
-                            {/* Navigation Links */}
-                            <div className="hidden md:flex md:ml-10 space-x-8">
+                            <div className="nav-links">
                                 {navigation.map((item) => (
                                     <Link
                                         key={item.name}
                                         href={item.href}
-                                        className={`inline-flex items-center px-4 py-2 text-base font-semibold transition-colors duration-200
-                                            ${route().current(item.routeName)
-                                                ? 'text-orange-500'
-                                                : 'text-black hover:text-orange-500'
-                                            }`}
+                                        className={`nav-link ${route().current(item.routeName) ? 'active' : ''}`}
                                     >
                                         {item.name}
                                     </Link>
@@ -42,16 +34,14 @@ export default function MainLayout({ header, children }: PropsWithChildren<{ hea
                             </div>
                         </div>
 
-                        {/* Wallet Status */}
                         <div className="hidden md:flex items-center">
                             <WalletStatus />
                         </div>
 
-                        {/* Menu Mobile */}
                         <div className="flex items-center md:hidden">
                             <button
                                 onClick={() => setShowingNavigationDropdown((show) => !show)}
-                                className="p-2 rounded-md text-gray-400 hover:bg-gray-100"
+                                className="mobile-menu-button"
                             >
                                 <span className="sr-only">Open menu</span>
                                 <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
@@ -75,18 +65,13 @@ export default function MainLayout({ header, children }: PropsWithChildren<{ hea
                     </div>
                 </div>
 
-                {/* Menu Mobile Déroulant */}
-                <div className={`md:hidden ${showingNavigationDropdown ? 'block' : 'hidden'}`}>
-                    <div className="pt-2 pb-3 space-y-1 px-4">
+                <div className={`mobile-menu ${showingNavigationDropdown ? 'block' : 'hidden'}`}>
+                    <div className="mobile-menu-links">
                         {navigation.map((item) => (
                             <Link
                                 key={item.name}
                                 href={item.href}
-                                className={`block px-3 py-2 rounded-md text-base font-medium
-                                    ${route().current(item.routeName)
-                                        ? 'text-indigo-600 bg-indigo-50'
-                                        : 'text-gray-900 hover:text-indigo-600 hover:bg-gray-50'
-                                    }`}
+                                className={`mobile-menu-link ${route().current(item.routeName) ? 'active' : ''}`}
                             >
                                 {item.name}
                             </Link>
@@ -100,17 +85,15 @@ export default function MainLayout({ header, children }: PropsWithChildren<{ hea
                 </div>
             </nav>
 
-            {/* Header */}
             {header && (
                 <header className="bg-white shadow-sm">
-                    <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+                    <div className="content-container py-4">
                         {header}
                     </div>
                 </header>
             )}
 
-            {/* Contenu */}
-            <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <main className="content-container py-6">
                 {children}
             </main>
         </div>

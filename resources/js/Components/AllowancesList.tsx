@@ -3,10 +3,6 @@ import { router, usePage } from '@inertiajs/react';
 import { useERC20 } from '@/hooks/useERC20';
 import { useAccount } from 'wagmi';
 import Modal from '@/Components/Modal';
-import SecondaryButton from '@/Components/SecondaryButton';
-import DangerButton from '@/Components/DangerButton';
-import TextInput from '@/Components/TextInput';
-import PrimaryButton from '@/Components/PrimaryButton';
 
 interface Allowance {
     id: number;
@@ -18,19 +14,21 @@ interface Allowance {
 
 interface Props {
     initialAllowances: Allowance[];
+    onUpdate?: () => Promise<void>;
 }
 
-export default function AllowancesList({ initialAllowances }: Props) {
+export default function AllowancesList({ initialAllowances, onUpdate }: Props) {
     const [allowances, setAllowances] = useState<Allowance[]>(initialAllowances);
     const [editingAllowance, setEditingAllowance] = useState<Allowance | null>(null);
     const [newAmount, setNewAmount] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const { address } = useAccount();
+    const [loadingStates, setLoadingStates] = useState<{[key: string]: boolean}>({});
     const { approve, revoke } = useERC20();
     const page = usePage();
 
     useEffect(() => {
-        setAllowances(initialAllowances);
+        if (initialAllowances) {
+            setAllowances([...initialAllowances]);
+        }
     }, [initialAllowances]);
 
     const truncateAddress = (address: string) => {
@@ -73,7 +71,8 @@ export default function AllowancesList({ initialAllowances }: Props) {
 
     const handleEditSubmit = async () => {
         if (!editingAllowance) return;
-        setIsLoading(true);
+        const key = `edit-${editingAllowance.id}`;
+        setLoadingStates(prev => ({ ...prev, [key]: true }));
 
         try {
             await approve(
@@ -87,97 +86,112 @@ export default function AllowancesList({ initialAllowances }: Props) {
             });
 
             setEditingAllowance(null);
-            router.reload();
+            
+            // Utiliser onUpdate si disponible
+            if (onUpdate) {
+                await onUpdate();
+            } else {
+                router.reload();
+            }
         } catch (error) {
             console.error('Edit error:', error);
         } finally {
-            setIsLoading(false);
+            setLoadingStates(prev => ({ ...prev, [key]: false }));
         }
     };
 
     const handleRevoke = async (allowance: Allowance) => {
-        setIsLoading(true);
+        const key = `revoke-${allowance.id}`;
+        setLoadingStates(prev => ({ ...prev, [key]: true }));
         try {
             await revoke(allowance.contract_address, allowance.spender_address);
-            await router.delete(route('allowances.destroy', allowance.id));
-            router.reload();
+            if (onUpdate) {
+                await onUpdate();
+            }
         } catch (error) {
             console.error('Revoke error:', error);
         } finally {
-            setIsLoading(false);
+            setLoadingStates(prev => ({ ...prev, [key]: false }));
+        }
+    };
+
+    const handleDelete = async (allowance: Allowance) => {
+        const key = `delete-${allowance.id}`;
+        setLoadingStates(prev => ({ ...prev, [key]: true }));
+        try {
+            await revoke(allowance.contract_address, allowance.spender_address);
+            await router.delete(route('allowances.destroy', allowance.id));
+        } catch (error) {
+            console.error('Delete error:', error);
+        } finally {
+            setLoadingStates(prev => ({ ...prev, [key]: false }));
         }
     };
 
     return (
         <div className="overflow-x-auto">
-            <table className="allowances-table min-w-full divide-y divide-gray-200">
+            <table className="allowances-table w-full">
                 <thead>
                     <tr>
-                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Contract
-                        </th>
-                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Owner
-                        </th>
-                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Spender
-                        </th>
-                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Amount
-                        </th>
-                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions
-                        </th>
+                        <th className="px-6 py-3">Contract</th>
+                        <th className="px-6 py-3">Owner</th>
+                        <th className="px-6 py-3">Spender</th>
+                        <th className="px-6 py-3">Amount</th>
+                        <th className="px-6 py-3">Actions</th>
                     </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody>
                     {allowances.map((allowance) => (
                         <tr key={`${allowance.contract_address}-${allowance.spender_address}`}>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                            <td className="px-6 py-4">
                                 <button 
                                     onClick={(e) => copyToClipboard(e, allowance.contract_address)}
-                                    className="text-gray-900 hover:text-orange-500 transition-colors cursor-pointer"
-                                    title="Click to copy full address"
+                                    className="truncated-address"
                                 >
                                     {truncateAddress(allowance.contract_address)}
                                 </button>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                            <td className="px-6 py-4">
                                 <button 
                                     onClick={(e) => copyToClipboard(e, allowance.owner_address)}
-                                    className="text-gray-900 hover:text-orange-500 transition-colors"
-                                    title="Click to copy"
+                                    className="truncated-address"
                                 >
                                     {truncateAddress(allowance.owner_address)}
                                 </button>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                            <td className="px-6 py-4">
                                 <button 
                                     onClick={(e) => copyToClipboard(e, allowance.spender_address)}
-                                    className="text-gray-900 hover:text-orange-500 transition-colors"
-                                    title="Click to copy"
+                                    className="truncated-address"
                                 >
                                     {truncateAddress(allowance.spender_address)}
                                 </button>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-gray-900">
+                            <td className="px-6 py-4">
                                 {allowance.allowance_amount}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="flex space-x-2">
+                            <td className="px-6 py-4">
+                                <div className="button-group">
                                     <button
                                         onClick={() => handleEditClick(allowance)}
-                                        disabled={isLoading}
-                                        className={`login-button ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        disabled={loadingStates[`edit-${allowance.id}`]}
+                                        className="login-button"
                                     >
-                                        {isLoading ? 'Processing...' : 'Edit'}
+                                        {loadingStates[`edit-${allowance.id}`] ? 'Processing...' : 'Edit'}
                                     </button>
                                     <button
                                         onClick={() => handleRevoke(allowance)}
-                                        disabled={isLoading}
-                                        className={`login-button inverted ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        disabled={loadingStates[`revoke-${allowance.id}`]}
+                                        className="login-button"
                                     >
-                                        {isLoading ? 'Processing...' : 'Revoke'}
+                                        {loadingStates[`revoke-${allowance.id}`] ? 'Processing...' : 'Revoke'}
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(allowance)}
+                                        disabled={loadingStates[`delete-${allowance.id}`]}
+                                        className="login-button"
+                                    >
+                                        {loadingStates[`delete-${allowance.id}`] ? 'Processing...' : 'Delete'}
                                     </button>
                                 </div>
                             </td>
@@ -193,63 +207,41 @@ export default function AllowancesList({ initialAllowances }: Props) {
                 </tbody>
             </table>
 
-            <Modal
-                show={!!editingAllowance}
-                onClose={() => setEditingAllowance(null)}
-            >
-                <div className="p-8 bg-white rounded-lg">
-                    <h3 className="text-2xl font-semibold text-black mb-6">
-                        Edit Allowance Amount
-                    </h3>
-                    <div className="space-y-6">
-                        {/* Contract Info */}
+            <Modal show={!!editingAllowance} onClose={() => setEditingAllowance(null)}>
+                <div className="card">
+                    <h3 className="text-2xl font-semibold text-black mb-6">Edit Allowance Amount</h3>
+                    <div className="form-container">
                         <div>
-                            <label className="block text-sm font-medium text-black mb-2">
-                                Contract Address
-                            </label>
+                            <label className="form-label">Contract Address</label>
                             <div className="text-gray-600">
                                 {truncateAddress(editingAllowance?.contract_address || '')}
                             </div>
                         </div>
 
-                        {/* Spender Info */}
                         <div>
-                            <label className="block text-sm font-medium text-black mb-2">
-                                Spender Address
-                            </label>
-                            <div className="text-gray-600">
-                                {truncateAddress(editingAllowance?.spender_address || '')}
-                            </div>
-                        </div>
-
-                        {/* New Amount Input */}
-                        <div>
-                            <label className="block text-sm font-medium text-black mb-2">
-                                New Amount
-                            </label>
+                            <label className="form-label">New Amount</label>
                             <input
                                 type="text"
                                 value={newAmount}
                                 onChange={(e) => setNewAmount(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                className="form-input"
                                 placeholder="Enter new amount..."
                             />
                         </div>
 
-                        {/* Buttons */}
-                        <div className="flex justify-end space-x-4 pt-6">
+                        <div className="button-group justify-end pt-6">
                             <button
                                 onClick={() => setEditingAllowance(null)}
-                                className="px-4 py-2 text-black hover:text-orange-500 transition-colors"
+                                className="grey-button"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleEditSubmit}
-                                disabled={isLoading}
-                                className={`login-button ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                disabled={loadingStates[`edit-${editingAllowance?.id}`]}
+                                className="login-button"
                             >
-                                {isLoading ? 'Processing...' : 'Update Amount'}
+                                {loadingStates[`edit-${editingAllowance?.id}`] ? 'Processing...' : 'Update Amount'}
                             </button>
                         </div>
                     </div>

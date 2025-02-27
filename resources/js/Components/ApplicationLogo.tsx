@@ -1,18 +1,10 @@
-interface Props {
-    className?: string;
-}
-
-export default function ApplicationLogo({ className }: Props) {
+export default function ApplicationLogo({ className }: { className?: string }) {
     return (
-        <div className="flex items-center justify-center">
+        <div className="app-logo">
             <img 
                 src="/images/kiln-logo.png" 
                 alt="Logo"
-                className={`w-auto h-12 ${className}`}
-                style={{ 
-                    objectFit: 'contain',
-                    maxWidth: 'none'
-                }}
+                className={`h-24 ${className}`}
             />
         </div>
     );

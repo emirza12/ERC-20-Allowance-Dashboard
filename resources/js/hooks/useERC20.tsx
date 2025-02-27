@@ -1,5 +1,7 @@
-import { useWriteContract, useReadContract } from 'wagmi';
+import { useWriteContract, useAccount } from 'wagmi';
+import { readContract } from '@wagmi/core';
 import { parseUnits, formatUnits } from 'viem';
+import { wagmiConfig } from '@/bootstrap';
 
 const ERC20_ABI = [
     {
@@ -26,6 +28,7 @@ const ERC20_ABI = [
 
 export function useERC20() {
     const { writeContractAsync } = useWriteContract();
+    const { address } = useAccount();
 
     const approve = async (contractAddress: string, spender: string, amount: string) => {
         try {
@@ -43,14 +46,23 @@ export function useERC20() {
 
     const getAllowance = async (contractAddress: string, owner: string, spender: string) => {
         try {
-            const result = await useReadContract({
+            if (!contractAddress || !owner || !spender) {
+                return '0';
+            }
+
+            const data = await readContract(wagmiConfig, {
                 address: contractAddress as `0x${string}`,
                 abi: ERC20_ABI,
                 functionName: 'allowance',
                 args: [owner as `0x${string}`, spender as `0x${string}`]
-            }).data;
-            return formatUnits(result as bigint, 18);
-        } catch (error) {
+            });
+            
+            return formatUnits(data as bigint, 18);
+        } catch (error: any) {
+            if (error.message?.includes('returned no data')) {
+                console.error('Invalid ERC20 contract address or not an ERC20 token');
+                throw new Error('Invalid ERC20 contract address or not an ERC20 token');
+            }
             throw error;
         }
     };

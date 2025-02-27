@@ -1,10 +1,16 @@
 import { createConfig } from 'wagmi'
-import { http } from 'viem'
+import { http, fallback } from 'viem'
 import { holesky } from 'viem/chains'
 import { injected } from 'wagmi/connectors'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClient } from '@tanstack/react-query'
 
-const transport = http()
+// Use multiple RPC providers with fallback
+const transport = fallback([
+  http('https://ethereum-holesky.blockpi.network/v1/rpc/public'),
+  http('https://rpc.ankr.com/eth_holesky'),
+  http('https://holesky.rpc.thirdweb.com'),
+  http('https://holesky.base.org')
+])
 
 export const queryClient = new QueryClient()
 

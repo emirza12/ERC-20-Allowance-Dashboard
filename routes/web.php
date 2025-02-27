@@ -23,3 +23,4 @@ Route::put('/allowances/{allowance}', [AllowanceController::class, 'update'])->n
 Route::delete('/allowances/{allowance}', [AllowanceController::class, 'destroy'])->name('allowances.destroy');
 
 
+

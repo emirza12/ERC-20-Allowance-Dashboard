@@ -6,9 +6,8 @@ export default function Home() {
         <MainLayout>
             <Head title="Home" />
             
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                    {/* En-tête */}
+            <div className="page-container">
+                <div className="content-container">
                     <div className="text-center mb-16">
                         <h1 className="text-4xl font-bold text-black mb-6">
                             ERC-20 Allowance Dashboard
@@ -19,20 +18,18 @@ export default function Home() {
                     </div>
 
                     <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                        {/* What is an allowance */}
-                        <div className="bg-white rounded-lg shadow-lg p-8 border border-black/10">
+                        <div className="card">
                             <h2 className="text-2xl font-semibold text-black mb-4">
                                 What is an Allowance?
                             </h2>
-                            <p className="text-gray-600 mb-4">
+                            <p className="text-gray-600">
                                 An allowance in ERC-20 tokens is a permission you grant to another address (like a smart contract) 
                                 to spend tokens on your behalf. This is essential for interacting with DeFi protocols and other 
                                 decentralized applications.
                             </p>
                         </div>
 
-                        {/* Key Features */}
-                        <div className="bg-white rounded-lg shadow-lg p-8 border border-black/10">
+                        <div className="card">
                             <h2 className="text-2xl font-semibold text-black mb-4">
                                 Key Features
                             </h2>
@@ -45,28 +42,20 @@ export default function Home() {
                             </ul>
                         </div>
 
-                        {/* Getting Started */}
-                        <div className="bg-white rounded-lg shadow-lg p-8 border border-black/10">
+                        <div className="card">
                             <h2 className="text-2xl font-semibold text-black mb-4">
                                 Getting Started
                             </h2>
                             <div className="text-gray-600 space-y-4">
-                                <p>
-                                    1. Connect your wallet using the button in the top right
-                                </p>
-                                <p>
-                                    2. Navigate to "Add" to create a new allowance
-                                </p>
-                                <p>
-                                    3. Use "Overview" to manage your existing allowances
-                                </p>
+                                <p>1. Connect your wallet using the button in the top right</p>
+                                <p>2. Navigate to "Add" to create a new allowance</p>
+                                <p>3. Use "Overview" to manage your existing allowances</p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Technical Info & About */}
                     <div className="mt-16">
-                        <div className="bg-white rounded-lg shadow-lg p-8 border border-black/10 lg:mx-auto max-w-5xl">
+                        <div className="card lg:mx-auto max-w-5xl">
                             <h2 className="text-2xl font-semibold text-black mb-4">
                                 About the Project
                             </h2>

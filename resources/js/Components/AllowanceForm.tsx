@@ -38,14 +38,14 @@ export default function AllowanceForm({ defaultOwnerAddress }: AllowanceFormProp
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="form-container">
             <div>
                 <InputLabel htmlFor="contract_address" value="Contract Address" />
                 <TextInput
                     id="contract_address"
                     type="text"
                     value={data.contract_address}
-                    className="mt-1 block w-full"
+                    className="form-group"
                     onChange={e => setData('contract_address', e.target.value)}
                     required
                 />
@@ -58,7 +58,7 @@ export default function AllowanceForm({ defaultOwnerAddress }: AllowanceFormProp
                     id="owner_address"
                     type="text"
                     value={data.owner_address}
-                    className="mt-1 block w-full"
+                    className="form-group"
                     onChange={e => setData('owner_address', e.target.value)}
                     required
                 />
@@ -71,7 +71,7 @@ export default function AllowanceForm({ defaultOwnerAddress }: AllowanceFormProp
                     id="spender_address"
                     type="text"
                     value={data.spender_address}
-                    className="mt-1 block w-full"
+                    className="form-group"
                     onChange={e => setData('spender_address', e.target.value)}
                     required
                 />
@@ -84,14 +84,14 @@ export default function AllowanceForm({ defaultOwnerAddress }: AllowanceFormProp
                     id="allowance_amount"
                     type="text"
                     value={data.allowance_amount}
-                    className="mt-1 block w-full"
+                    className="form-group"
                     onChange={e => setData('allowance_amount', e.target.value)}
                     required
                 />
                 <InputError message={errors.allowance_amount} className="mt-2" />
             </div>
 
-            <div className="flex items-center justify-end">
+            <div className="form-actions">
                 <PrimaryButton type="submit" disabled={processing}>
                     Add Allowance
                 </PrimaryButton>

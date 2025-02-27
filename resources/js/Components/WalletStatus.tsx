@@ -1,7 +1,5 @@
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { injected } from 'wagmi/connectors';
-import PrimaryButton from '@/Components/PrimaryButton';
-import SecondaryButton from '@/Components/SecondaryButton';
 
 export default function WalletStatus() {
     const { address, isConnected } = useAccount();
@@ -50,13 +48,13 @@ export default function WalletStatus() {
     }
 
     return (
-        <div className="flex items-center space-x-4">
-            <div className="flex items-center bg-black/5 px-6 py-3 rounded-full">
+        <div className="wallet-container">
+            <div className="wallet-address">
                 <div className="flex items-center">
-                    <div className="w-2.5 h-2.5 bg-orange-500 rounded-full mr-3" />
+                    <div className="wallet-status-dot" />
                     <button 
                         onClick={(e) => copyToClipboard(e, address || '')}
-                        className="text-black font-medium hover:text-orange-500 transition-colors"
+                        className="wallet-address-text"
                         title="Click to copy address"
                     >
                         {address?.slice(0, 6)}...{address?.slice(-4)}
@@ -64,20 +62,9 @@ export default function WalletStatus() {
                 </div>
             </div>
             
-            <button
-                onClick={() => disconnect()}
-                className="login-button inverted"
-            >
-                <svg 
-                    className="w-4 h-4 mr-2 inline" 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                >
-                    <path 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        strokeWidth="2" 
+            <button onClick={() => disconnect()} className="login-button inverted">
+                <svg className="disconnect-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
                         d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" 
                     />
                 </svg>
