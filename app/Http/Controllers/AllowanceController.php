@@ -47,12 +47,12 @@ class AllowanceController extends Controller
     public function update(Request $request, Allowance $allowance)
     {
         $allowance->update($request->validate(['allowance_amount' => 'required|string']));
-        return redirect()->route('allowances.index');
+        return redirect()->route('overview');
     }
 
     public function destroy(Allowance $allowance)
     {
         $allowance->delete();
-        return redirect()->route('allowances.index');
+        return redirect()->route('overview');
     }
 } 
