@@ -51,17 +51,18 @@ npm run dev
 
 ## 📁 Project Structure
 
-### Key Files
-- `resources/js/Pages/` 
-  - `Home.tsx` - Landing page
-  - `Overview.tsx` - Dashboard with allowances list
-  - `AddAllowance.tsx` - Form to add new allowances
+### Frontend
+- `resources/js/Pages/` - React pages (Home, Overview, AddAllowance)
 - `resources/js/Components/` - React components
 - `resources/js/hooks/useERC20.tsx` - Web3 interactions
 - `resources/js/bootstrap.ts` - Holesky network configuration
+- `resources/css/app.css` - Global styles
+
+### Backend
 - `routes/web.php` - Application routes
-- `resources/css/app.css` - Global styles and TailwindCSS
-- `.env` - environment variables (nothing congidential in it)
+- `app/Http/Controllers/AllowanceController.php` - CRUD operations
+- `app/Models/Allowance.php` - Database model and validation
+- `.env` - Environment variables (nothing congidential in it)
 
 ## 🎨 Design
 
