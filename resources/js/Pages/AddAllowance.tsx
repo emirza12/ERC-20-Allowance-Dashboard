@@ -9,24 +9,27 @@ import { usePage } from '@inertiajs/react';
 export default function AddAllowance() {
     const { address } = useAccount();
     const { getAllowance } = useERC20();
-    const { approve } = useERC20();
+    
+    // Initialize form with connected wallet address
     const [formData, setFormData] = useState({
         contract_address: '',
         spender_address: '',
-        owner_address: address || '',
-        allowance_amount: '0'
+        owner_address: address || ''
     });
+    
     const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const { errors } = usePage().props;
     const page = usePage().props as any;
 
+    // Handle backend validation errors
     useEffect(() => {
         if (errors.error) {
             setMessage(errors.error);
         }
     }, [errors]);
 
+    // Ensure wallet is connected before showing form
     if (!address) {
         return (
             <MainLayout>
@@ -48,14 +51,14 @@ export default function AddAllowance() {
         setMessage('');
 
         try {
-            // D'abord, vérifier si l'adresse du contrat est valide en essayant de récupérer l'allowance
+            // Fetch current allowance from blockchain
             const currentAllowance = await getAllowance(
                 formData.contract_address,
                 formData.owner_address,
                 formData.spender_address
             );
 
-            // Ensuite, vérifier si l'allowance existe déjà
+            // Check if allowance already exists in database
             const allowances = (page.allowances || []) as any[];
             const allowanceExists = allowances.some(allowance => 
                 allowance.contract_address.toLowerCase() === formData.contract_address.toLowerCase() &&
@@ -69,11 +72,9 @@ export default function AddAllowance() {
                 return;
             }
 
-            // Si tout est bon, ajouter l'allowance
+            // Store allowance in database
             await router.post(route('allowances.store'), {
-                contract_address: formData.contract_address,
-                spender_address: formData.spender_address,
-                owner_address: formData.owner_address,
+                ...formData,
                 allowance_amount: currentAllowance
             });
 

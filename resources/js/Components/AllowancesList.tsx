@@ -3,6 +3,7 @@ import { router, usePage } from '@inertiajs/react';
 import { useERC20 } from '@/hooks/useERC20';
 import { useAccount } from 'wagmi';
 import Modal from '@/Components/Modal';
+import copyToClipboard from '@/Components/CopyToClipboard';
 
 interface Allowance {
     id: number;
@@ -26,74 +27,44 @@ export default function AllowancesList({ initialAllowances, onUpdate }: Props) {
     const page = usePage();
     const { address } = useAccount();
 
+    // Update allowances when props change
     useEffect(() => {
         if (initialAllowances) {
             setAllowances([...initialAllowances]);
         }
     }, [initialAllowances]);
 
+    // Format address for display: 0x1234...5678
     const truncateAddress = (address: string) => {
         return `${address.slice(0, 6)}...${address.slice(-4)}`;
     };
-
-    const copyToClipboard = async (e: React.MouseEvent, text: string) => {
-        e.preventDefault();  // Prevent navigation
-        try {
-            if (navigator.clipboard && window.isSecureContext) {
-                await navigator.clipboard.writeText(text);
-            } else {
-                // Fallback for non-secure contexts
-                const textArea = document.createElement('textarea');
-                textArea.value = text;
-                textArea.style.position = 'fixed';
-                textArea.style.left = '-999999px';
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-                document.execCommand('copy');
-                textArea.remove();
-            }
-
-            // Visual feedback
-            const button = e.currentTarget as HTMLButtonElement;
-            const originalText = button.textContent;
-            button.textContent = 'Copied!';
-            setTimeout(() => {
-                button.textContent = originalText;
-            }, 1000);
-        } catch (err) {
-            console.error('Failed to copy:', err);
-        }
-    };
-
+    
+    // Handle edit modal opening
     const handleEditClick = (allowance: Allowance) => {
         setEditingAllowance(allowance);
     };
 
+    // Update allowance amount on blockchain and database
     const handleEditSubmit = async () => {
         if (!editingAllowance) return;
         const key = `edit-${editingAllowance.id}`;
         setLoadingStates(prev => ({ ...prev, [key]: true }));
 
         try {
+            // First update blockchain
             await approve(
                 editingAllowance.contract_address,
                 editingAllowance.spender_address,
                 newAmount
             );
 
+            // Then update database
             await router.put(route('allowances.update', editingAllowance.id), {
                 allowance_amount: newAmount
             });
 
             setEditingAllowance(null);
-            
-            // Utiliser onUpdate si disponible
-            if (onUpdate) {
-                await onUpdate();
-            } else {
-                router.reload();
-            }
+            onUpdate ? await onUpdate() : router.reload();
         } catch (error) {
             console.error('Edit error:', error);
         } finally {
@@ -101,14 +72,13 @@ export default function AllowancesList({ initialAllowances, onUpdate }: Props) {
         }
     };
 
+    // Revoke allowance on blockchain
     const handleRevoke = async (allowance: Allowance) => {
         const key = `revoke-${allowance.id}`;
         setLoadingStates(prev => ({ ...prev, [key]: true }));
         try {
             await revoke(allowance.contract_address, allowance.spender_address);
-            if (onUpdate) {
-                await onUpdate();
-            }
+            if (onUpdate) await onUpdate();
         } catch (error) {
             console.error('Revoke error:', error);
         } finally {
@@ -116,14 +86,13 @@ export default function AllowancesList({ initialAllowances, onUpdate }: Props) {
         }
     };
 
+    // Remove allowance from tracking (database only)
     const handleDelete = async (allowance: Allowance) => {
         const key = `delete-${allowance.id}`;
         setLoadingStates(prev => ({ ...prev, [key]: true }));
         try {
             await router.delete(route('allowances.destroy', allowance.id));
-            setAllowances(currentAllowances => 
-                currentAllowances.filter(a => a.id !== allowance.id)
-            );
+            setAllowances(current => current.filter(a => a.id !== allowance.id));
         } catch (error) {
             console.error('Delete error:', error);
         } finally {
@@ -131,7 +100,7 @@ export default function AllowancesList({ initialAllowances, onUpdate }: Props) {
         }
     };
 
-    // Fonction pour vérifier si l'utilisateur est le propriétaire
+    // Check if connected wallet is the allowance owner
     const isOwner = (allowance: Allowance) => {
         return address?.toLowerCase() === allowance.owner_address.toLowerCase();
     };

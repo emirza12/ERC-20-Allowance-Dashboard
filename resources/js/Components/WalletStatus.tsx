@@ -1,40 +1,12 @@
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { injected } from 'wagmi/connectors';
+import copyToClipboard from '@/Components/CopyToClipboard';
 
 export default function WalletStatus() {
     const { address, isConnected } = useAccount();
     const { connect } = useConnect();
     const { disconnect } = useDisconnect();
 
-    const copyToClipboard = async (e: React.MouseEvent, text: string) => {
-        e.preventDefault();  // Prevent navigation
-        try {
-            if (navigator.clipboard && window.isSecureContext) {
-                await navigator.clipboard.writeText(text);
-            } else {
-                // Fallback for non-secure contexts
-                const textArea = document.createElement('textarea');
-                textArea.value = text;
-                textArea.style.position = 'fixed';
-                textArea.style.left = '-999999px';
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-                document.execCommand('copy');
-                textArea.remove();
-            }
-
-            // Visual feedback
-            const button = e.currentTarget as HTMLButtonElement;
-            const originalText = button.textContent;
-            button.textContent = 'Copied!';
-            setTimeout(() => {
-                button.textContent = originalText;
-            }, 1000);
-        } catch (err) {
-            console.error('Failed to copy:', err);
-        }
-    };
 
     if (!isConnected) {
         return (
