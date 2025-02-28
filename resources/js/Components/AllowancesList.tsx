@@ -24,6 +24,7 @@ export default function AllowancesList({ initialAllowances, onUpdate }: Props) {
     const [loadingStates, setLoadingStates] = useState<{[key: string]: boolean}>({});
     const { approve, revoke } = useERC20();
     const page = usePage();
+    const { address } = useAccount();
 
     useEffect(() => {
         if (initialAllowances) {
@@ -119,13 +120,20 @@ export default function AllowancesList({ initialAllowances, onUpdate }: Props) {
         const key = `delete-${allowance.id}`;
         setLoadingStates(prev => ({ ...prev, [key]: true }));
         try {
-            await revoke(allowance.contract_address, allowance.spender_address);
             await router.delete(route('allowances.destroy', allowance.id));
+            setAllowances(currentAllowances => 
+                currentAllowances.filter(a => a.id !== allowance.id)
+            );
         } catch (error) {
             console.error('Delete error:', error);
         } finally {
             setLoadingStates(prev => ({ ...prev, [key]: false }));
         }
+    };
+
+    // Fonction pour vérifier si l'utilisateur est le propriétaire
+    const isOwner = (allowance: Allowance) => {
+        return address?.toLowerCase() === allowance.owner_address.toLowerCase();
     };
 
     return (
@@ -142,7 +150,7 @@ export default function AllowancesList({ initialAllowances, onUpdate }: Props) {
                 </thead>
                 <tbody>
                     {allowances.map((allowance) => (
-                        <tr key={`${allowance.contract_address}-${allowance.spender_address}`}>
+                        <tr key={`${allowance.contract_address}-${allowance.owner_address}-${allowance.spender_address}`}>
                             <td className="px-6 py-4">
                                 <button 
                                     onClick={(e) => copyToClipboard(e, allowance.contract_address)}
@@ -172,20 +180,24 @@ export default function AllowancesList({ initialAllowances, onUpdate }: Props) {
                             </td>
                             <td className="px-6 py-4">
                                 <div className="button-group">
-                                    <button
-                                        onClick={() => handleEditClick(allowance)}
-                                        disabled={loadingStates[`edit-${allowance.id}`]}
-                                        className="login-button"
-                                    >
-                                        {loadingStates[`edit-${allowance.id}`] ? 'Processing...' : 'Edit'}
-                                    </button>
-                                    <button
-                                        onClick={() => handleRevoke(allowance)}
-                                        disabled={loadingStates[`revoke-${allowance.id}`]}
-                                        className="login-button"
-                                    >
-                                        {loadingStates[`revoke-${allowance.id}`] ? 'Processing...' : 'Revoke'}
-                                    </button>
+                                    {isOwner(allowance) ? (
+                                        <>
+                                            <button
+                                                onClick={() => handleEditClick(allowance)}
+                                                disabled={loadingStates[`edit-${allowance.id}`]}
+                                                className="login-button"
+                                            >
+                                                {loadingStates[`edit-${allowance.id}`] ? 'Processing...' : 'Edit'}
+                                            </button>
+                                            <button
+                                                onClick={() => handleRevoke(allowance)}
+                                                disabled={loadingStates[`revoke-${allowance.id}`]}
+                                                className="login-button"
+                                            >
+                                                {loadingStates[`revoke-${allowance.id}`] ? 'Processing...' : 'Revoke'}
+                                            </button>
+                                        </>
+                                    ) : null}
                                     <button
                                         onClick={() => handleDelete(allowance)}
                                         disabled={loadingStates[`delete-${allowance.id}`]}

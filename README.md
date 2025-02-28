@@ -8,7 +8,27 @@ This application allows users to:
 - Track multiple ERC20 token approvals in one dashboard
 - Monitor allowance amounts in real-time
 - Add new allowances to track
-- View all approvals for connected wallet address
+- Remove allowances from dashboard (without modifying blockchain state)
+- View all approvals once connected
+
+## 🔑 Key Features
+
+### Adding Allowances
+- Only valid ERC20 contracts are accepted
+- Duplicate allowances are prevented (based on contract, owner, and spender addresses)
+- Can track allowances for any owner address (not just connected wallet)
+
+### Managing Allowances
+When owner address is the connected wallet:
+- Can modify allowance amount
+- Can revoke allowance (set to zero)
+- Can remove from dashboard
+
+When owner address is different from connected wallet:
+- Can only remove from dashboard
+- Cannot modify or revoke allowance (read-only mode)
+- Useful for monitoring other addresses' allowances
+
 
 ## 🛠 Tech Stack
 
@@ -41,7 +61,7 @@ npm run dev
 - `resources/js/bootstrap.ts` - Holesky network configuration
 - `routes/web.php` - Application routes
 - `resources/css/app.css` - Global styles and TailwindCSS
-- `.env.example` - Example environment variables
+- `.env` - environment variables (nothing congidential in it)
 
 ## 🎨 Design
 

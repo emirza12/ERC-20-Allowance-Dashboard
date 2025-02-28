@@ -51,7 +51,7 @@ export default function AddAllowance() {
             // D'abord, vérifier si l'adresse du contrat est valide en essayant de récupérer l'allowance
             const currentAllowance = await getAllowance(
                 formData.contract_address,
-                address as string,
+                formData.owner_address,
                 formData.spender_address
             );
 
@@ -60,11 +60,12 @@ export default function AddAllowance() {
             const allowanceExists = allowances.some(allowance => 
                 allowance.contract_address.toLowerCase() === formData.contract_address.toLowerCase() &&
                 allowance.spender_address.toLowerCase() === formData.spender_address.toLowerCase() &&
-                allowance.owner_address.toLowerCase() === address?.toLowerCase()
+                allowance.owner_address.toLowerCase() === formData.owner_address.toLowerCase()
             );
 
             if (allowanceExists) {
                 setMessage('This allowance already exists in your dashboard');
+                setIsLoading(false);
                 return;
             }
 
@@ -72,7 +73,7 @@ export default function AddAllowance() {
             await router.post(route('allowances.store'), {
                 contract_address: formData.contract_address,
                 spender_address: formData.spender_address,
-                owner_address: address,
+                owner_address: formData.owner_address,
                 allowance_amount: currentAllowance
             });
 
