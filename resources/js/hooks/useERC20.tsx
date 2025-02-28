@@ -1,4 +1,4 @@
-import { useWriteContract, useAccount } from 'wagmi';
+import { useWriteContract} from 'wagmi';
 import { readContract } from '@wagmi/core';
 import { parseUnits, formatUnits } from 'viem';
 import { wagmiConfig } from '@/bootstrap';
@@ -28,7 +28,6 @@ const ERC20_ABI = [
 
 export function useERC20() {
     const { writeContractAsync } = useWriteContract();
-    const { address } = useAccount();
 
     const approve = async (contractAddress: string, spender: string, amount: string) => {
         try {
